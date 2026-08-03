@@ -1,0 +1,159 @@
+<Window x:Class="PcSetupMaintainer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PC Setup Maintainer" Height="760" Width="1180"
+        MinHeight="680" MinWidth="980" Background="{StaticResource SurfaceBrush}">
+  <Grid Margin="18">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <DockPanel Margin="0,0,0,14">
+      <StackPanel DockPanel.Dock="Left">
+        <TextBlock Text="PC Setup Maintainer" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+        <TextBlock Text="Online driver updates, downloadable app installs, and selectable Windows maintenance tweaks." Foreground="#475569" />
+      </StackPanel>
+      <Button DockPanel.Dock="Right" Content="Open Log" Click="OpenLog_Click" HorizontalAlignment="Right" />
+    </DockPanel>
+
+    <TabControl Grid.Row="1">
+      <TabItem Header="Drivers">
+        <Grid Margin="4,14,4,4">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <Border Background="{StaticResource CardBrush}" Padding="16" CornerRadius="8" Margin="0,0,0,12">
+            <StackPanel>
+              <TextBlock Text="Online driver, BIOS, and firmware updater" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock Text="Scans Windows Update plus supported OEM/GPU/chipset update tools. Select what to download or install. BIOS/firmware updates require explicit opt-in." Foreground="#475569" TextWrapping="Wrap" Margin="0,4,0,10" />
+              <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <Button Content="Scan Online" Click="ScanDriverUpdates_Click" />
+                <Button Content="Download Selected" Click="DownloadDriverUpdates_Click" />
+                <CheckBox x:Name="IncludeFirmwareCheckBox" Content="Allow BIOS/Firmware installs" VerticalAlignment="Center" Margin="12,0,0,0" />
+                <Button Content="Install Selected" Click="InstallDriverUpdates_Click" />
+              </StackPanel>
+              <DockPanel>
+                <TextBlock Text="Download folder:" VerticalAlignment="Center" Margin="4,0,6,0" />
+                <TextBox x:Name="DriverDownloadPathBox" DockPanel.Dock="Left" MinWidth="560" />
+                <Button Content="Open Downloads" Click="OpenDriverDownloadFolder_Click" />
+              </DockPanel>
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Row="1" Background="{StaticResource CardBrush}" Padding="16" CornerRadius="8" Margin="0,0,0,12">
+            <StackPanel>
+              <TextBlock Text="Detected hardware" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock x:Name="HardwareText" Text="Click Scan Online to detect hardware and find update sources." Foreground="#475569" TextWrapping="Wrap" Margin="0,6,0,0" />
+            </StackPanel>
+          </Border>
+
+          <DataGrid Grid.Row="2" x:Name="DriverUpdatesGrid" AutoGenerateColumns="False"
+                    Background="{StaticResource CardBrush}" HeadersVisibility="Column">
+            <DataGrid.Columns>
+              <DataGridCheckBoxColumn Header="Use" Binding="{Binding IsSelected}" Width="60" />
+              <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="150" />
+              <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="280" IsReadOnly="True" />
+              <DataGridTextColumn Header="Provider" Binding="{Binding Provider}" Width="130" />
+              <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="210" IsReadOnly="True" />
+              <DataGridCheckBoxColumn Header="BIOS/Firmware" Binding="{Binding IsFirmwareOrBios}" Width="110" IsReadOnly="True" />
+              <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="140" IsReadOnly="True" />
+              <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*" IsReadOnly="True" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Software">
+        <Grid Margin="4,14,4,4">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <Border Background="{StaticResource CardBrush}" Padding="12" CornerRadius="8" Margin="0,0,0,12">
+            <StackPanel>
+              <DockPanel Margin="0,0,0,8">
+                <TextBox x:Name="SoftwareSearchBox" DockPanel.Dock="Left" MinWidth="520" TextChanged="SoftwareSearchBox_TextChanged" />
+                <Button Content="Select Visible" Click="SelectVisibleSoftware_Click" />
+                <Button Content="Clear" Click="ClearSoftware_Click" />
+                <Button Content="Download Selected" Click="DownloadSoftware_Click" />
+                <Button Content="Install Selected" Click="InstallSoftware_Click" />
+                <Button Content="Export Script" Click="ExportSoftwareScript_Click" />
+              </DockPanel>
+              <DockPanel>
+                <TextBlock Text="Download folder:" VerticalAlignment="Center" Margin="4,0,6,0" />
+                <TextBox x:Name="SoftwareDownloadPathBox" DockPanel.Dock="Left" MinWidth="560" />
+                <Button Content="Open Downloads" Click="OpenSoftwareDownloadFolder_Click" />
+              </DockPanel>
+            </StackPanel>
+          </Border>
+
+          <DataGrid Grid.Row="1" x:Name="SoftwareGrid" AutoGenerateColumns="False" Background="{StaticResource CardBrush}">
+            <DataGrid.Columns>
+              <DataGridCheckBoxColumn Header="Install" Binding="{Binding IsSelected}" Width="75" />
+              <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="230" IsReadOnly="True" />
+              <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="160" IsReadOnly="True" />
+              <DataGridTextColumn Header="Winget ID" Binding="{Binding Id}" Width="260" IsReadOnly="True" />
+              <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="True" />
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Grid.Row="2" Text="Download Selected fetches installers through winget into the chosen folder. Install Selected downloads and installs selected apps inside the app workflow." Foreground="#475569" Margin="4,10,0,0" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="PC Tweaks">
+        <Grid Margin="4,14,4,4">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <Border Background="{StaticResource CardBrush}" Padding="12" CornerRadius="8" Margin="0,0,0,12">
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Text="Safe tweaks are selected by default. Advanced tweaks are opt-in." Foreground="#475569" />
+              <Button Content="Apply Selected Tweaks" Click="ApplyTweaks_Click" HorizontalAlignment="Right" />
+            </DockPanel>
+          </Border>
+
+          <DataGrid Grid.Row="1" x:Name="TweaksGrid" AutoGenerateColumns="False" Background="{StaticResource CardBrush}">
+            <DataGrid.Columns>
+              <DataGridCheckBoxColumn Header="Apply" Binding="{Binding IsSelected}" Width="70" />
+              <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="260" IsReadOnly="True" />
+              <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="150" IsReadOnly="True" />
+              <DataGridCheckBoxColumn Header="Advanced" Binding="{Binding IsAdvanced}" Width="90" IsReadOnly="True" />
+              <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="True" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Logs">
+        <Grid Margin="4,14,4,4">
+          <DataGrid x:Name="LogGrid" AutoGenerateColumns="False" IsReadOnly="True" Background="{StaticResource CardBrush}">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="210" />
+              <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="90" />
+              <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </Grid>
+      </TabItem>
+    </TabControl>
+
+    <Grid Grid.Row="2" Margin="0,12,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="180" />
+      </Grid.ColumnDefinitions>
+      <ProgressBar x:Name="ProgressBar" Height="18" Minimum="0" Maximum="100" />
+      <TextBlock x:Name="StatusText" Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" Text="Ready" Foreground="#475569" />
+    </Grid>
+  </Grid>
+</Window>
