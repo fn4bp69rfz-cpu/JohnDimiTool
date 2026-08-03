@@ -62,6 +62,16 @@ PcSetupMaintainer.exe
 PcSetupMaintainer.exe.sha256
 ```
 
+## No-install portable launch
+
+Inspired by the Chris Titus Tech WinUtil style, this command launches the latest version without installing it, creating shortcuts, or writing Start Menu entries:
+
+```powershell
+irm https://raw.githubusercontent.com/fn4bp69rfz-cpu/JohnDimiTool/main/scripts/Run-Portable.ps1 | iex
+```
+
+Portable mode downloads the latest `PcSetupMaintainer.exe` release asset into `%TEMP%\PcSetupMaintainer-Portable\<version>`, verifies SHA-256, and runs it. It restarts itself as Administrator by default because driver updates and many tweaks need elevation.
+
 ## Driver support boundary
 
 Windows Update driver packages can be discovered/downloaded/installed directly. BIOS and firmware updates are vendor-specific and are automated only through supported manufacturer utilities. The app intentionally does not force silent BIOS flashing because that can brick hardware if prerequisites such as AC power, BitLocker suspension, model matching, or reboot handling are wrong.
