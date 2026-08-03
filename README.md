@@ -2,11 +2,12 @@
 
 A Windows desktop application for PC setup and maintenance:
 
-- driver discovery and offline package creation;
-- exported current-system driver payloads via `pnputil`;
-- OEM/GPU/chipset update utility planning through supported vendor tools;
-- searchable `winget`-backed software catalog;
-- safe Windows cleanup, privacy, power, gaming, and startup-management tweaks;
+- online driver discovery through Windows Update;
+- selected or automatic driver download/install through Windows Update;
+- OEM/GPU/chipset update flows for supported Dell, Lenovo, HP, NVIDIA, AMD, and Intel updater tools;
+- BIOS and firmware update support through vendor-supported tools only, with explicit opt-in;
+- searchable `winget`-backed software catalog with in-app download and install actions;
+- prebuilt Windows cleanup, privacy, power, gaming, network, and startup-management tweaks;
 - structured logging and progress reporting;
 - publish script and one-line PowerShell installer bootstrap.
 
@@ -20,22 +21,29 @@ Install the .NET 8 SDK, then run:
 
 Output is written to `artifacts\app\win-x64`.
 
-## Create an offline driver package
+## Driver, BIOS, and firmware updates
 
-Run the app as Administrator and use the Drivers tab. It creates:
+Run the app as Administrator and use the Drivers tab:
 
-- `drivers\exported-current-system` with `pnputil` exported drivers;
-- `metadata\hardware.json`;
-- `metadata\driver-plan.json`;
-- `Setup.ps1`.
+- `Scan Online` detects hardware and searches Windows Update for available driver packages.
+- OEM/GPU/chipset rows appear when supported hardware is detected.
+- `Download Selected` downloads or prepares selected update packages where the provider supports it.
+- `Install Selected` installs selected updates.
+- BIOS/Firmware rows are skipped unless `Allow BIOS/Firmware installs` is explicitly enabled.
 
-To turn the package into a single `Setup.exe`:
+BIOS and firmware updates intentionally use Dell/Lenovo/HP supported updater tools where available. The app does not scrape random BIOS files or force blind flashing.
 
-```powershell
-.\scripts\Build-OfflineDriverInstaller.ps1 -PackageRoot .\PcSetupDriverPackage -Runtime win-x64
-```
+## Software downloader/installer
 
-The generated `Setup.exe` embeds the package payload and launches `Setup.ps1` as Administrator on the target PC.
+Use the Software tab to search the built-in catalog, select apps, then either:
+
+- `Download Selected` to save installers into the chosen download folder;
+- `Install Selected` to download/install the apps through `winget`;
+- `Export Script` to generate a reusable PowerShell install script.
+
+## PC tweaks
+
+The PC Tweaks tab contains prebuilt selectable actions. Safe defaults are selected automatically; advanced options require confirmation.
 
 ## One-line install
 
@@ -56,4 +64,4 @@ PcSetupMaintainer.exe.sha256
 
 ## Driver support boundary
 
-Driver packaging can reliably export already-installed Plug and Play drivers. BIOS and firmware updates are vendor-specific and are only automated through supported manufacturer utilities. The app intentionally does not force silent BIOS flashing because that can brick hardware if prerequisites such as AC power, BitLocker suspension, model matching, or reboot handling are wrong.
+Windows Update driver packages can be discovered/downloaded/installed directly. BIOS and firmware updates are vendor-specific and are automated only through supported manufacturer utilities. The app intentionally does not force silent BIOS flashing because that can brick hardware if prerequisites such as AC power, BitLocker suspension, model matching, or reboot handling are wrong.
